@@ -115,6 +115,10 @@ public final class SqlLib {
         return null;
     }
 
+    public static SqlLib of(Connection connection) {
+        return new SqlLib(connection);
+    }
+
     public SqlStatement getStatement() {
         return statement;
     }
