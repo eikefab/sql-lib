@@ -76,7 +76,7 @@ public class UserTest {
     public void testBatch() {
         final List<User> users = new ArrayList<>();
 
-        for (int id = 3; id < 100; id++) {
+        for (int id = 3; id <= 100; id++) {
             final String name = Double.toHexString(Math.random()).substring(0, 16);
             final User user = new User(id, name);
 
@@ -92,7 +92,7 @@ public class UserTest {
                 users
         );
 
-        Assertions.assertEquals(97, batches.length);
+        Assertions.assertEquals(98, batches.length);
     }
 
     @AfterAll
