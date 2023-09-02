@@ -12,7 +12,7 @@ public class UserAdapter implements SqlResultAdapter<User>, SqlBatchAdapter<User
     @Override
     public User adapt(ResultSet resultSet) throws SQLException {
         final int id = resultSet.getInt("id");
-        final String name = resultSet.getNString("name");
+        final String name = resultSet.getString("name");
 
         return new User(id, name);
     }

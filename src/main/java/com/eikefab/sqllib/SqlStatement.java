@@ -47,6 +47,29 @@ public class SqlStatement {
     }
 
     /**
+     * Utilizes the SqlBatchAdapter to transform the value directly into
+     * the statement.
+     *
+     * @param query the sql query
+     * @param adapterClass the class of the adapter impl
+     * @param value the value
+     * @param <T> generic data
+     */
+    public <T> void update(String query, Class<? extends SqlBatchAdapter<T>> adapterClass, T value) {
+        try {
+            SqlBatchAdapter<T> adapter = adapterClass.getDeclaredConstructor().newInstance();
+
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
+                adapter.batch(value, statement);
+
+                statement.executeUpdate();
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+    }
+
+    /**
      * Executes a update query on the database
      *
      * @param query the sql query
@@ -107,7 +130,7 @@ public class SqlStatement {
      */
     public <T> T resultOne(String query, AdaptConsumer<PreparedStatement> consumer, Class<? extends SqlResultAdapter<T>> adapterClass) {
         try {
-            final SqlResultAdapter<T> adapter = adapterClass.newInstance();
+            final SqlResultAdapter<T> adapter = adapterClass.getDeclaredConstructor().newInstance();
             final AtomicReference<T> value = new AtomicReference<>();
 
             query(
@@ -141,7 +164,7 @@ public class SqlStatement {
         final Set<T> set = new HashSet<>();
 
         try {
-            final SqlResultAdapter<T> adapter = adapterClass.newInstance();
+            final SqlResultAdapter<T> adapter = adapterClass.getDeclaredConstructor().newInstance();
 
             query(
                     query,

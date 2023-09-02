@@ -95,6 +95,21 @@ public class UserTest {
         Assertions.assertEquals(98, batches.length);
     }
 
+    @Test
+    public void testInsert() {
+        final User user = new User(101, "fabricio 2");
+
+        STATEMENT.update("INSERT INTO `users` (`id`, `name`) VALUES (?, ?)", UserAdapter.class, user);
+
+        STATEMENT.query(
+                "SELECT `id`, `name` FROM `users` WHERE `id` = 101",
+                (statement) -> {},
+                (set) -> {
+                    Assertions.assertTrue(set.next());
+                }
+        );
+    }
+
     @AfterAll
     public static void drop() {
         STATEMENT.update("DROP TABLE `users`;");
