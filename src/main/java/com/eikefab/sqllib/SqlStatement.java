@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -52,6 +53,30 @@ public class SqlStatement {
      */
     public void update(String query) {
         update(query, (statement) -> {});
+    }
+
+    /**
+     * Executes a batch update on the database
+     *
+     * @param query the sql query
+     * @param adapter the batch adapter
+     * @param collection the data to adapt into the batch
+     * @return the executed batch count
+     */
+    public <T> int[] batch(String query, SqlBatchAdapter<T> adapter, Collection<T> collection) {
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            for (T value : collection) {
+                adapter.batch(value, statement);
+
+                statement.addBatch();
+            }
+
+            return statement.executeBatch();
+        } catch (Exception exception) {
+            exception.printStackTrace();
+        }
+
+        return new int[0];
     }
 
     /**

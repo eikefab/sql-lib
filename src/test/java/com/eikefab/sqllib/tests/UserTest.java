@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 public class UserTest {
@@ -44,7 +46,7 @@ public class UserTest {
                 UserAdapter.class
         );
 
-        Assertions.assertEquals(2, user.size());
+        Assertions.assertTrue(user.size() > 1);
     }
 
     @Test
@@ -68,6 +70,29 @@ public class UserTest {
                     Assertions.assertEquals("eike", name);
                 }
         );
+    }
+
+    @Test
+    public void testBatch() {
+        final List<User> users = new ArrayList<>();
+
+        for (int id = 3; id < 100; id++) {
+            final String name = Double.toHexString(Math.random()).substring(0, 16);
+            final User user = new User(id, name);
+
+            users.add(user);
+        }
+
+        final int[] batches = STATEMENT.batch(
+                "INSERT INTO `users` (`id`, `name`) VALUES (?, ?)",
+                (value, statement) -> {
+                    statement.setInt(1, value.getId());
+                    statement.setString(2, value.getName());
+                },
+                users
+        );
+
+        Assertions.assertEquals(97, batches.length);
     }
 
     @AfterAll
